@@ -1,0 +1,11 @@
+import { Router } from "express";
+
+import { listarUsuarios } from "../controllers/usuarioController.js";
+import { verificarToken } from "../middlewares/authmiddlewares.js";
+
+const router = Router();
+
+router.get("/", verificarToken, listarUsuarios);
+router.post("/", verificarToken, listarUsuarios);
+
+export default router;
