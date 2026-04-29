@@ -1,5 +1,3 @@
-// src/tests/alunos.test.js
-
 import request from "supertest";
 import app from "../../server.js";
 
@@ -30,10 +28,12 @@ describe("Rotas de Alunos", () => {
       .set("Authorization", `Bearer ${token}`)
       .send({
         nome: "Aluno Teste",
+        cpf: `000.${Date.now().toString().slice(-3)}.000-00`,
         email: `aluno${Date.now()}@email.com`,
-        senha: "123456",
-        matricula: `MAT${Date.now()}`,
+        telefone: "11999999999",
+        data_nascimento: "2000-01-01",
         turma_id: 1,
+        status: "ativo",
       });
 
     expect(response.status).toBe(201);
@@ -66,9 +66,12 @@ describe("Rotas de Alunos", () => {
       .set("Authorization", `Bearer ${token}`)
       .send({
         nome: "Aluno Atualizado",
+        cpf: `111.${Date.now().toString().slice(-3)}.111-11`,
         email: `atualizado${Date.now()}@email.com`,
-        matricula: `MAT${Date.now()}`,
+        telefone: "11888888888",
+        data_nascimento: "2000-01-01",
         turma_id: 1,
+        status: "ativo",
       });
 
     expect(response.status).toBe(200);

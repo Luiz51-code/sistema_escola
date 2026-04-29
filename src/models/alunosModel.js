@@ -1,64 +1,15 @@
-// src/models/alunoModel.js
-
 import conexao from "../config/db.js";
-
 export const listarAlunosModel = async () => {
-  let conn;
-
-  try {
-    conn = await conexao.getConnection();
-
-    const [alunos] = await conn.query(`
-      SELECT
-        a.id,
-        a.nome,
-        a.cpf,
-        a.email,
-        a.telefone,
-        a.data_nascimento,
-        a.turma_id,
-        a.status,
-        t.nome AS turma
-      FROM alunos a
-      LEFT JOIN turmas t ON a.turma_id = t.id
-      ORDER BY a.nome
-    `);
-
-    return alunos;
-  } finally {
-    if (conn) conn.release();
-  }
+  const [rows] = await conexao.query("SELECT * FROM alunos");
+  return rows;
 };
 
 export const buscarAlunoPorIdModel = async (id) => {
-  let conn;
-
-  try {
-    conn = await conexao.getConnection();
-
-    const [rows] = await conn.query(
-      `
-      SELECT
-        a.id,
-        a.nome,
-        a.cpf,
-        a.email,
-        a.telefone,
-        a.data_nascimento,
-        a.turma_id,
-        a.status,
-        t.nome AS turma
-      FROM alunos a
-      LEFT JOIN turmas t ON a.turma_id = t.id
-      WHERE a.id = ?
-      `,
-      [id]
-    );
-
-    return rows[0] || null;
-  } finally {
-    if (conn) conn.release();
-  }
+  const [rows] = await conexao.query(
+    "SELECT * FROM alunos WHERE id = ?",
+    [id]
+  );
+  return rows[0];
 };
 
 export const criarAlunoModel = async ({
@@ -70,37 +21,27 @@ export const criarAlunoModel = async ({
   turma_id,
   status,
 }) => {
-  let conn;
+  const [result] = await conexao.query(
+    `INSERT INTO alunos 
+     (nome, cpf, email, telefone, data_nascimento, turma_id, status)
+     VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    [
+      nome,
+      cpf,
+      email,
+      telefone,
+      data_nascimento,
+      turma_id,
+      status || "ativo",
+    ]
+  );
 
-  try {
-    conn = await conexao.getConnection();
-
-    const [result] = await conn.query(
-      `
-      INSERT INTO alunos
-      (nome, cpf, email, telefone, data_nascimento, turma_id, status)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-      `,
-      [
-        nome,
-        cpf,
-        email,
-        telefone,
-        data_nascimento,
-        turma_id,
-        status || "ativo",
-      ]
-    );
-
-    return result.insertId;
-  } finally {
-    if (conn) conn.release();
-  }
+  return result.insertId;
 };
 
-export const atualizarAlunoModel = async (
-  id,
-  {
+// ATUALIZAR
+export const atualizarAlunoModel = async (id, dados) => {
+  const {
     nome,
     cpf,
     email,
@@ -108,57 +49,27 @@ export const atualizarAlunoModel = async (
     data_nascimento,
     turma_id,
     status,
-  }
-) => {
-  let conn;
+  } = dados;
 
-  try {
-    conn = await conexao.getConnection();
-
-    const [result] = await conn.query(
-      `
-      UPDATE alunos
-      SET
-        nome = ?,
-        cpf = ?,
-        email = ?,
-        telefone = ?,
-        data_nascimento = ?,
-        turma_id = ?,
-        status = ?
-      WHERE id = ?
-      `,
-      [
-        nome,
-        cpf,
-        email,
-        telefone,
-        data_nascimento,
-        turma_id,
-        status,
-        id,
-      ]
-    );
-
-    return result.affectedRows;
-  } finally {
-    if (conn) conn.release();
-  }
+  await conexao.query(
+    `UPDATE alunos SET
+      nome = ?, cpf = ?, email = ?, telefone = ?, 
+      data_nascimento = ?, turma_id = ?, status = ?
+     WHERE id = ?`,
+    [
+      nome,
+      cpf,
+      email,
+      telefone,
+      data_nascimento,
+      turma_id,
+      status,
+      id,
+    ]
+  );
 };
 
+// REMOVER
 export const removerAlunoModel = async (id) => {
-  let conn;
-
-  try {
-    conn = await conexao.getConnection();
-
-    const [result] = await conn.query(
-      "DELETE FROM alunos WHERE id = ?",
-      [id]
-    );
-
-    return result.affectedRows;
-  } finally {
-    if (conn) conn.release();
-  }
+  await conexao.query("DELETE FROM alunos WHERE id = ?", [id]);
 };

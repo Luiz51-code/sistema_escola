@@ -3,7 +3,7 @@ app.use(
     origin: [
       "http://localhost:5173",
       "https://sistema-de-escola.vercel.app",
-      "https://bootleg-detector-clad.ngrok-free.dev"  // ← ADICIONE ESTA LINHA
+      "https://bootleg-detector-clad.ngrok-free.dev",
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: [
@@ -11,5 +11,6 @@ app.use(
       "Authorization",
       "ngrok-skip-browser-warning",
     ],
+    credentials: true,
   })
 );

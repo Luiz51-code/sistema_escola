@@ -4,7 +4,28 @@ import { verificarToken } from "../middlewares/authMiddleware.js";
 
 const router = Router();
 
-// Rota protegida para listar usuários
-router.get("/", verificarToken, listarUsuarios);
+/**
+ * @swagger
+ * tags:
+ *   name: Usuários
+ *   description: Gerenciamento de usuários
+ */
 
+/**
+ * @swagger
+ * /usuarios:
+ *   get:
+ *     summary: Lista todos os usuários
+ *     tags: [Usuários]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Lista de usuários
+ *       401:
+ *         description: Não autorizado (token inválido ou ausente)
+ *       500:
+ *         description: Erro no servidor
+ */
+router.get("/", verificarToken, listarUsuarios);
 export default router;

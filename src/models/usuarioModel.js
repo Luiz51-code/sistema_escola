@@ -20,10 +20,8 @@
 //   }
 // };
 
-// models/usuarioModel.js
 import conexao from "../config/db.js";
 
-// 🔍 Buscar todos os usuários
 export const buscarTodosUsuarios = async () => {
   let conn;
 

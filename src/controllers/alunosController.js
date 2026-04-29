@@ -1,6 +1,3 @@
-// 
-
-
 import {
   listarAlunosModel,
   buscarAlunoPorIdModel,
@@ -54,14 +51,13 @@ export const criarAluno = async (req, res) => {
       status,
     } = req.body;
 
-    // ✅ validação mais segura (evita erro no banco)
     if (!nome || !cpf || !email || !turma_id) {
       return res.status(400).json({
         mensagem: "Campos obrigatórios faltando",
       });
     }
 
-    const result = await criarAlunoModel({
+    const insertId = await criarAlunoModel({
       nome,
       cpf,
       email,
@@ -73,8 +69,9 @@ export const criarAluno = async (req, res) => {
 
     return res.status(201).json({
       mensagem: "Aluno cadastrado com sucesso",
-      id: result.insertId, // ✅ correção importante
+      id: insertId,
     });
+
   } catch (error) {
     return res.status(500).json({
       mensagem: "Erro ao cadastrar aluno",
