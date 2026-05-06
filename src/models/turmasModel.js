@@ -30,7 +30,7 @@ export const criarTurma = async (turma) => {
        VALUES (?, ?, ?)`,
       [
         turma.nome,
-        turma.ano,
+        turma.ano_letivo,
         turma.professor_id ?? null,
       ]
     );
@@ -88,7 +88,7 @@ export const atualizarTurma = async (id, turma) => {
        WHERE id = ?`,
       [
         turma.nome,
-        turma.ano,
+        turma.ano_letivo,
         turma.professor_id ?? null,
         id
       ]

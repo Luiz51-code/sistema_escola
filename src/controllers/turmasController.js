@@ -58,7 +58,7 @@
 //   // Descomente estas linhas:
 //   await atualizarTurmaModel(id, {
 //     nome,
-//     ano, // ou ano_letivo, dependendo do que seu model espera
+//     ano_letivo, // ou ano, dependendo do que seu model espera
 //     professor_id,
 //   });
 
@@ -123,18 +123,18 @@ export const listarTurmas = async (req, res) => {
   }
 };
 
-// ✅ Função usando MODEL
+
 export const criarTurma = async (req, res) => {
   try {
-    const { nome, ano, professor_id } = req.body;
+    const { nome, ano_letivo, professor_id } = req.body;
 
-    if (!nome || !ano) {
-      return res.status(400).json({ mensagem: "Os campos 'nome' e 'ano' são obrigatórios" });
+    if (!nome || !ano_letivo) {
+      return res.status(400).json({ mensagem: "Os campos 'nome' e 'ano_letivo' são obrigatórios" });
     }
 
     const result = await criarTurmaModel({
       nome,
-      ano,
+      ano_letivo,
       professor_id,
     });
 
@@ -152,11 +152,11 @@ export const criarTurma = async (req, res) => {
 export const atualizarTurma = async (req, res) => {
   try {
     const { id } = req.params;
-    const { nome, ano, professor_id } = req.body;
+    const { nome, ano_letivo, professor_id } = req.body;
 
     await atualizarTurmaModel(id, {
       nome,
-      ano,
+      ano_letivo,
       professor_id,
     });
 

@@ -1,14 +1,21 @@
 import conexao from "../config/db.js";
+
 export const listarAlunosModel = async () => {
-  const [rows] = await conexao.query("SELECT * FROM alunos");
+  const [rows] = await conexao.query(`
+    SELECT alunos.*, COALESCE(turmas.nome, 'Sem turma') AS turma
+    FROM alunos
+    LEFT JOIN turmas ON alunos.turma_id = turmas.id
+  `);
   return rows;
 };
 
 export const buscarAlunoPorIdModel = async (id) => {
-  const [rows] = await conexao.query(
-    "SELECT * FROM alunos WHERE id = ?",
-    [id]
-  );
+  const [rows] = await conexao.query(`
+    SELECT alunos.*, COALESCE(turmas.nome, 'Sem turma') AS turma
+    FROM alunos
+    LEFT JOIN turmas ON alunos.turma_id = turmas.id
+    WHERE alunos.id = ?
+  `, [id]);
   return rows[0];
 };
 
@@ -39,7 +46,6 @@ export const criarAlunoModel = async ({
   return result.insertId;
 };
 
-// ATUALIZAR
 export const atualizarAlunoModel = async (id, dados) => {
   const {
     nome,
@@ -69,7 +75,6 @@ export const atualizarAlunoModel = async (id, dados) => {
   );
 };
 
-// REMOVER
 export const removerAlunoModel = async (id) => {
   await conexao.query("DELETE FROM alunos WHERE id = ?", [id]);
 };

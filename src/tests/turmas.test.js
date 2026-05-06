@@ -32,8 +32,8 @@ describe("Rotas de Turmas - CRUD Completo", () => {
       .post("/turmas")
       .set("Authorization", `Bearer ${token}`)
       .send({
-        nome: `Turma Teste ${Date.now()}`,
-        ano: 2024,
+        nome: "Turma Teste",
+        ano_letivo: 2024,
       });
     
     console.log("   Status:", createRes.status);
@@ -67,7 +67,6 @@ describe("Rotas de Turmas - CRUD Completo", () => {
     expect(Array.isArray(listRes.body)).toBe(true);
     console.log(`   ✅ Total de turmas: ${listRes.body.length}`);
     
-    // 4. ATUALIZAR TURMA
     console.log("\n✏️ 4. Atualizando turma...");
     const updateRes = await request(app)
       .put(`/turmas/${createdTurmaId}`)

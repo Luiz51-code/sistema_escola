@@ -64,7 +64,7 @@ export const criarAluno = async (req, res) => {
       telefone,
       data_nascimento,
       turma_id,
-      status,
+      status
     });
 
     return res.status(201).json({
