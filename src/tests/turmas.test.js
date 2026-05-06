@@ -73,7 +73,7 @@ describe("Rotas de Turmas - CRUD Completo", () => {
       .set("Authorization", `Bearer ${token}`)
       .send({
         nome: `Turma Atualizada ${Date.now()}`,
-        ano: 2025,
+        ano_letivo: 2025,
       });
     
     console.log("   Status:", updateRes.status);
