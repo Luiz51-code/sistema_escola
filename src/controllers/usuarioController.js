@@ -1,16 +1,13 @@
+import db from "../config/db.js";
+import bcrypt from "bcrypt";
 
-import {
-  buscarTodosUsuarios,
-  buscarUsuarioPorId as buscarUsuarioPorIdModel,
-  criarUsuarioModel,
-  atualizarUsuarioModel,
-  deletarUsuarioModel,
-} from "../models/usuarioModel.js";
-
+// GET /usuarios — Lista todos os usuários
 export const listarUsuarios = async (req, res) => {
   try {
-    const usuarios = await buscarTodosUsuarios();
-    return res.status(200).json(usuarios);
+    const [rows] = await db.query(
+      "SELECT id, nome, email, perfil, criado_em FROM usuarios"
+    );
+    return res.status(200).json(rows);
   } catch (error) {
     return res.status(500).json({
       mensagem: "Erro ao listar usuários",
@@ -19,19 +16,55 @@ export const listarUsuarios = async (req, res) => {
   }
 };
 
+// POST /usuarios — Cria um novo usuário
+export const criarUsuario = async (req, res) => {
+  try {
+    const { nome, email, senha, perfil, tipo } = req.body;
+
+    if (!nome || !email || !senha) {
+      return res.status(400).json({
+        mensagem: "Campos obrigatórios: nome, email, senha",
+      });
+    }
+
+    const senhaHash = await bcrypt.hash(senha, 10);
+    const perfilFinal = perfil || tipo || "admin"; // ✅ aceita perfil ou tipo
+
+    const [result] = await db.query(
+      "INSERT INTO usuarios (nome, email, senha, perfil) VALUES (?, ?, ?, ?)",
+      [nome, email, senhaHash, perfilFinal]
+    );
+
+    return res.status(201).json({
+      mensagem: "Usuário criado com sucesso",
+      id: result.insertId,
+    });
+  } catch (error) {
+    if (error.code === "ER_DUP_ENTRY") {
+      return res.status(409).json({ mensagem: "Email já cadastrado" });
+    }
+    return res.status(500).json({
+      mensagem: "Erro ao criar usuário",
+      erro: error.message,
+    });
+  }
+};
+
+// GET /usuarios/:id — Busca usuário por ID
 export const buscarUsuarioPorId = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const usuario = await buscarUsuarioPorIdModel(id);
+    const [rows] = await db.query(
+      "SELECT id, nome, email, perfil, criado_em FROM usuarios WHERE id = ?",
+      [id]
+    );
 
-    if (!usuario) {
-      return res.status(404).json({
-        mensagem: "Usuário não encontrado",
-      });
+    if (rows.length === 0) {
+      return res.status(404).json({ mensagem: "Usuário não encontrado" });
     }
 
-    return res.status(200).json(usuario);
+    return res.status(200).json(rows[0]);
   } catch (error) {
     return res.status(500).json({
       mensagem: "Erro ao buscar usuário",
@@ -40,53 +73,29 @@ export const buscarUsuarioPorId = async (req, res) => {
   }
 };
 
-export const criarUsuario = async (req, res) => {
-  try {
-    const { nome, email, senha } = req.body;
-
-    if (!nome || !email || !senha) {
-      return res.status(400).json({
-        mensagem: "Campos obrigatórios faltando",
-      });
-    }
-
-    const result = await criarUsuarioModel({
-      nome,
-      email,
-      senha,
-    });
-
-    return res.status(201).json({
-      mensagem: "Usuário criado com sucesso",
-      id: result.insertId,
-    });
-
-  } catch (error) {
-    return res.status(500).json({
-      mensagem: "Erro ao criar usuário",
-      erro: error.message,
-    });
-  }
-};
-
+// PUT /usuarios/:id — Atualiza um usuário
 export const atualizarUsuario = async (req, res) => {
   try {
     const { id } = req.params;
+    const { nome, email, perfil, tipo } = req.body;
 
-    const usuarioExiste = await buscarUsuarioPorIdModel(id);
+    const [exists] = await db.query(
+      "SELECT id FROM usuarios WHERE id = ?",
+      [id]
+    );
 
-    if (!usuarioExiste) {
-      return res.status(404).json({
-        mensagem: "Usuário não encontrado",
-      });
+    if (exists.length === 0) {
+      return res.status(404).json({ mensagem: "Usuário não encontrado" });
     }
 
-    await atualizarUsuarioModel(id, req.body);
+    const perfilFinal = perfil || tipo || "admin"; // ✅ aceita perfil ou tipo
 
-    return res.status(200).json({
-      mensagem: "Usuário atualizado com sucesso",
-    });
+    await db.query(
+      "UPDATE usuarios SET nome = ?, email = ?, perfil = ? WHERE id = ?",
+      [nome, email, perfilFinal, id]
+    );
 
+    return res.status(200).json({ mensagem: "Usuário atualizado com sucesso" });
   } catch (error) {
     return res.status(500).json({
       mensagem: "Erro ao atualizar usuário",
@@ -95,24 +104,23 @@ export const atualizarUsuario = async (req, res) => {
   }
 };
 
+// DELETE /usuarios/:id — Remove um usuário
 export const removerUsuario = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const usuarioExiste = await buscarUsuarioPorIdModel(id);
+    const [exists] = await db.query(
+      "SELECT id FROM usuarios WHERE id = ?",
+      [id]
+    );
 
-    if (!usuarioExiste) {
-      return res.status(404).json({
-        mensagem: "Usuário não encontrado",
-      });
+    if (exists.length === 0) {
+      return res.status(404).json({ mensagem: "Usuário não encontrado" });
     }
 
-    await deletarUsuarioModel(id);
+    await db.query("DELETE FROM usuarios WHERE id = ?", [id]);
 
-    return res.status(200).json({
-      mensagem: "Usuário removido com sucesso",
-    });
-
+    return res.status(200).json({ mensagem: "Usuário removido com sucesso" });
   } catch (error) {
     return res.status(500).json({
       mensagem: "Erro ao remover usuário",

@@ -1,5 +1,11 @@
 import { Router } from "express";
-import { listarUsuarios } from "../controllers/usuarioController.js";
+import {
+  listarUsuarios,
+  criarUsuario,       // ✅ adicionado
+  buscarUsuarioPorId, // ✅ adicionado
+  atualizarUsuario,   // ✅ adicionado
+  removerUsuario,     // ✅ adicionado
+} from "../controllers/usuarioController.js";
 import { verificarToken } from "../middlewares/authMiddleware.js";
 
 const router = Router();
@@ -28,4 +34,128 @@ const router = Router();
  *         description: Erro no servidor
  */
 router.get("/", verificarToken, listarUsuarios);
+
+/**
+ * @swagger
+ * /usuarios:
+ *   post:
+ *     summary: Cria um novo usuário
+ *     tags: [Usuários]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - nome
+ *               - email
+ *               - senha
+ *             properties:
+ *               nome:
+ *                 type: string
+ *                 example: João Silva
+ *               email:
+ *                 type: string
+ *                 example: joao@email.com
+ *               senha:
+ *                 type: string
+ *                 example: senha123
+ *               perfil:
+ *                 type: string
+ *                 example: admin
+ *     responses:
+ *       201:
+ *         description: Usuário criado com sucesso
+ *       400:
+ *         description: Dados inválidos
+ *       409:
+ *         description: Email já cadastrado
+ */
+router.post("/", verificarToken, criarUsuario); // ✅ adicionado
+
+/**
+ * @swagger
+ * /usuarios/{id}:
+ *   get:
+ *     summary: Busca um usuário por ID
+ *     tags: [Usuários]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Usuário encontrado
+ *       404:
+ *         description: Usuário não encontrado
+ */
+router.get("/:id", verificarToken, buscarUsuarioPorId); // ✅ adicionado
+
+/**
+ * @swagger
+ * /usuarios/{id}:
+ *   put:
+ *     summary: Atualiza um usuário
+ *     tags: [Usuários]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               nome:
+ *                 type: string
+ *                 example: João Atualizado
+ *               email:
+ *                 type: string
+ *                 example: joao.novo@email.com
+ *               perfil:
+ *                 type: string
+ *                 example: admin
+ *     responses:
+ *       200:
+ *         description: Usuário atualizado com sucesso
+ *       404:
+ *         description: Usuário não encontrado
+ */
+router.put("/:id", verificarToken, atualizarUsuario); // ✅ adicionado
+
+/**
+ * @swagger
+ * /usuarios/{id}:
+ *   delete:
+ *     summary: Remove um usuário
+ *     tags: [Usuários]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Usuário removido com sucesso
+ *       404:
+ *         description: Usuário não encontrado
+ */
+router.delete("/:id", verificarToken, removerUsuario); // ✅ adicionado
+
 export default router;

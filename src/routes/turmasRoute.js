@@ -3,7 +3,8 @@ import {
   listarTurmas,
   criarTurma,
   atualizarTurma,
-  deletarTurma
+  deletarTurma,
+  buscarTurmaPorId, // ✅ adicionado
 } from "../controllers/turmasController.js";
 
 import { verificarToken } from "../middlewares/authMiddleware.js";
@@ -32,6 +33,28 @@ const router = Router();
  *         description: Erro no servidor
  */
 router.get("/", verificarToken, listarTurmas);
+
+/**
+ * @swagger
+ * /turmas/{id}:
+ *   get:
+ *     summary: Busca uma turma por ID
+ *     tags: [Turmas]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Turma encontrada
+ *       404:
+ *         description: Turma não encontrada
+ */
+router.get("/:id", verificarToken, buscarTurmaPorId); // ✅ adicionado
 
 /**
  * @swagger

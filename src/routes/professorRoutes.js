@@ -1,10 +1,10 @@
-// 
 import { Router } from "express";
 import {
   listarProfessores,
   criarProfessor,
   atualizarProfessor,
-  removerProfessor
+  removerProfessor,
+  buscarProfessorPorId, // ✅ adicionado
 } from "../controllers/professorController.js";
 
 import { verificarToken } from "../middlewares/authMiddleware.js";
@@ -33,6 +33,28 @@ const router = Router();
  *         description: Erro no servidor
  */
 router.get("/", verificarToken, listarProfessores);
+
+/**
+ * @swagger
+ * /professores/{id}:
+ *   get:
+ *     summary: Busca um professor por ID
+ *     tags: [Professores]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Professor encontrado
+ *       404:
+ *         description: Professor não encontrado
+ */
+router.get("/:id", verificarToken, buscarProfessorPorId); // ✅ adicionado
 
 /**
  * @swagger
@@ -128,4 +150,5 @@ router.put("/:id", verificarToken, atualizarProfessor);
  *         description: Professor não encontrado
  */
 router.delete("/:id", verificarToken, removerProfessor);
+
 export default router;
